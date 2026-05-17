@@ -129,6 +129,41 @@ div[data-testid="metric-container"] {
         color: white;
     }
 }
+.job-card {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e4eb;
+    transition: transform 0.2s, border 0.2s;
+    box-shadow: 1px 1px 4px rgba(0,0,0,0.05);
+}
+.job-card:hover {
+    border: 1px solid #4F8BF9;
+    transform: scale(1.01);
+}
+.job-title {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #4F8BF9;
+}
+.job-detail {
+    margin: 3px 0;
+    color: #555;
+    font-size: 0.95rem;
+}
+@media (prefers-color-scheme: dark) {
+    .job-card {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+    }
+    .job-title {
+        color: #4F8BF9;
+    }
+    .job-detail {
+        color: #ddd;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -148,7 +183,7 @@ else:
     # -----------------------------
     # TABS FOR ORGANIZATION
     # -----------------------------
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🛠 Skills & Salary", "📄 Raw Data"])
+    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🛠 Skills & Salary", "📄 Job Listings"])
 
     with tab1:
         st.subheader("Market Overview")
@@ -208,8 +243,23 @@ else:
 
     with tab3:
         st.subheader("Job Listings")
-        st.dataframe(df_display, use_container_width=True)
+        
+        # Render Job Cards
+        cards_html = ""
+        for _, row in df_display.iterrows():
+            salary_text = f"₹{row['salary']:,.0f}" if row['salary'] > 0 else "Not Disclosed"
+            cards_html += f"""
+            <div class="job-card">
+                <h3 class="job-title">{row['Title']}</h3>
+                <p class="job-detail">🏢 <strong>Company:</strong> {row['Company']}</p>
+                <p class="job-detail">📍 <strong>Location:</strong> {row['Location']}</p>
+                <p class="job-detail">🛠 <strong>Skills:</strong> {row['skills']}</p>
+                <p class="job-detail">💰 <strong>Salary:</strong> {salary_text}</p>
+            </div>
+            """
+        st.markdown(cards_html, unsafe_allow_html=True)
         
         # DOWNLOAD
+        st.markdown("<br>", unsafe_allow_html=True)
         csv = df_display.to_csv(index=False)
         st.download_button("📥 Download Full Data as CSV", csv, "jobs.csv", "text/csv")
