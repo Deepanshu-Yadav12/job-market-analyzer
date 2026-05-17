@@ -109,80 +109,107 @@ if selected_location != "All" and not df_display.empty:
     df_display = df_display[df_display["Location"] == selected_location]
 
 # -----------------------------
-# DATA TABLE
+# CUSTOM CSS FOR CARDS
 # -----------------------------
-st.subheader("📄 Job Listings")
-st.dataframe(df_display)
+st.markdown("""
+<style>
+div[data-testid="metric-container"] {
+    background-color: #f0f2f6;
+    border: 1px solid #e0e4eb;
+    padding: 5% 5% 5% 10%;
+    border-radius: 10px;
+    color: #1f1f1f;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+}
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+    div[data-testid="metric-container"] {
+        background-color: #262730;
+        border: 1px solid #33343d;
+        color: white;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
 
-# -----------------------------
-# DOWNLOAD
-# -----------------------------
-if not df_display.empty:
-    csv = df_display.to_csv(index=False)
-    st.download_button("📥 Download Data", csv, "jobs.csv", "text/csv")
-
-# -----------------------------
-# ANALYTICS SECTION
-# -----------------------------
 if df_display.empty:
     st.info("No data available. Please fetch real-time data.")
 else:
-
-    # TOP COMPANIES
-    st.subheader("🏢 Top Companies")
-    st.bar_chart(df_display["Company"].value_counts().head(15))
-
-    # TOP LOCATIONS
-    st.subheader("📍 Top Locations")
-    st.bar_chart(df_display["Location"].value_counts().head(15))
-
-    # SKILLS ANALYSIS
-    st.subheader("🛠 Skills Analysis")
-
-    valid_skills = [
-        s for s in df_display["skills"]
-        if pd.notna(s) and s != "Not Specified"
-    ]
-
-    if valid_skills:
-        all_skills = ",".join(valid_skills)
-        skills_list = [s.strip() for s in all_skills.split(",") if s.strip()]
-
-        skill_counts = Counter(skills_list)
-
-        skills_df = pd.DataFrame({
-            "Skill": list(skill_counts.keys()),
-            "Count": list(skill_counts.values())
-        }).sort_values(by="Count", ascending=False)
-
-        st.bar_chart(skills_df.set_index("Skill"))
-
-        # PIE CHART
-        st.subheader("📊 Skills Distribution")
-        fig, ax = plt.subplots()
-        ax.pie(skills_df["Count"], labels=skills_df["Skill"], autopct="%1.1f%%")
-        st.pyplot(fig)
-    else:
-        st.write("No skills data available.")
-
-    # SALARY ANALYSIS
-    st.subheader("💰 Salary Insights")
-
-    salary_df = df_display[df_display["salary"] > 0]
-
-    if not salary_df.empty:
-        col1, col2 = st.columns(2)
-        col1.metric("Average Salary", f"₹{salary_df['salary'].mean():,.0f}")
-        col2.metric("Max Salary", f"₹{salary_df['salary'].max():,.0f}")
-
-        st.bar_chart(salary_df[["Company", "salary"]].set_index("Company").head(20))
-    else:
-        st.write("No salary data available.")
-
-    # KPI METRICS
-    st.subheader("📊 KPIs")
-
+    # -----------------------------
+    # KPI METRICS (TOP CARDS)
+    # -----------------------------
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total Jobs", len(df_display))
-    col2.metric("Companies", df_display["Company"].nunique())
-    col3.metric("Locations", df_display["Location"].nunique())
+    col1.metric("📌 Total Jobs", len(df_display))
+    col2.metric("🏢 Unique Companies", df_display["Company"].nunique())
+    col3.metric("📍 Unique Locations", df_display["Location"].nunique())
+    
+    st.markdown("---")
+
+    # -----------------------------
+    # TABS FOR ORGANIZATION
+    # -----------------------------
+    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🛠 Skills & Salary", "📄 Raw Data"])
+
+    with tab1:
+        st.subheader("Market Overview")
+        colA, colB = st.columns(2)
+        
+        with colA:
+            st.markdown("**Top Companies Hiring**")
+            st.bar_chart(df_display["Company"].value_counts().head(10))
+            
+        with colB:
+            st.markdown("**Top Locations**")
+            st.bar_chart(df_display["Location"].value_counts().head(10))
+
+    with tab2:
+        # SKILLS ANALYSIS
+        st.subheader("Skills Analysis")
+        valid_skills = [
+            s for s in df_display["skills"]
+            if pd.notna(s) and s != "Not Specified"
+        ]
+
+        if valid_skills:
+            all_skills = ",".join(valid_skills)
+            skills_list = [s.strip() for s in all_skills.split(",") if s.strip()]
+            skill_counts = Counter(skills_list)
+            skills_df = pd.DataFrame({
+                "Skill": list(skill_counts.keys()),
+                "Count": list(skill_counts.values())
+            }).sort_values(by="Count", ascending=False)
+
+            colC, colD = st.columns([2, 1])
+            with colC:
+                st.markdown("**Most In-Demand Skills**")
+                st.bar_chart(skills_df.set_index("Skill").head(10))
+            with colD:
+                st.markdown("**Skills Distribution**")
+                fig, ax = plt.subplots()
+                ax.pie(skills_df["Count"].head(7), labels=skills_df["Skill"].head(7), autopct="%1.1f%%")
+                st.pyplot(fig)
+        else:
+            st.info("No skills data available.")
+
+        # SALARY ANALYSIS
+        st.markdown("---")
+        st.subheader("💰 Salary Insights")
+        salary_df = df_display[df_display["salary"] > 0]
+
+        if not salary_df.empty:
+            sal_col1, sal_col2 = st.columns(2)
+            sal_col1.metric("Average Salary", f"₹{salary_df['salary'].mean():,.0f}")
+            sal_col2.metric("Max Salary", f"₹{salary_df['salary'].max():,.0f}")
+
+            st.markdown("**Salaries by Company**")
+            st.bar_chart(salary_df[["Company", "salary"]].set_index("Company").head(15))
+        else:
+            st.info("No salary data available.")
+
+    with tab3:
+        st.subheader("Job Listings")
+        st.dataframe(df_display, use_container_width=True)
+        
+        # DOWNLOAD
+        csv = df_display.to_csv(index=False)
+        st.download_button("📥 Download Full Data as CSV", csv, "jobs.csv", "text/csv")
