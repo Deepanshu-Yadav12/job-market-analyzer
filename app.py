@@ -43,8 +43,8 @@ if 'df' not in st.session_state:
 # -----------------------------
 st.sidebar.header("⚙️ API Configuration")
 st.sidebar.markdown("**Adzuna API Credentials** ([Get Free Key](https://developer.adzuna.com/))")
-app_id = st.sidebar.text_input("App ID", type="password")
-app_key = st.sidebar.text_input("App Key", type="password")
+app_id = st.sidebar.text_input("App ID", value="8a8de657", type="password")
+app_key = st.sidebar.text_input("App Key", value="82c19ad1b7cd6b44a70c50ed3343e805", type="password")
 
 st.sidebar.header("🔍 Search Jobs")
 job_query = st.sidebar.text_input("Job Title", "Data Analyst")
