@@ -24,7 +24,7 @@ except (KeyError, FileNotFoundError):
 # -----------------------------
 st.set_page_config(
     page_title="HireScope",
-    page_icon="💼",
+    page_icon=None,
     layout="wide"
 )
 
@@ -199,8 +199,8 @@ hr {
 # -----------------------------
 st.markdown("""
 <div class="hero-banner">
-    <div class="hero-badge">📡 Live Data Analytics</div>
-    <h1 class="hero-title">💼 HireScope</h1>
+    <div class="hero-badge">Live Data Analytics</div>
+    <h1 class="hero-title">HireScope</h1>
     <p class="hero-subtitle">Real-Time Job Market Intelligence Platform &nbsp;·&nbsp; Powered by Adzuna API</p>
 </div>
 """, unsafe_allow_html=True)
@@ -237,12 +237,12 @@ if "df" not in st.session_state:
 # -----------------------------
 # SIDEBAR CONTROLS
 # -----------------------------
-st.sidebar.markdown("## 🔍 Search Jobs")
+st.sidebar.markdown("## Search Jobs")
 job_query = st.sidebar.text_input("Job Title", "Data Analyst")
 job_location = st.sidebar.text_input("Location", "India")
 num_results = st.sidebar.slider("Number of Results", 10, 100, 50)
 
-if st.sidebar.button("🚀 Fetch Real-Time Data", use_container_width=True):
+if st.sidebar.button("Fetch Real-Time Data", use_container_width=True):
     if not app_id or not app_key:
         st.sidebar.error("Missing API credentials. Check .env file.")
     else:
@@ -255,12 +255,12 @@ if st.sidebar.button("🚀 Fetch Real-Time Data", use_container_width=True):
             )
             if new_df is not None and not new_df.empty:
                 st.session_state.df = new_df
-                st.sidebar.success(f"✅ {len(new_df)} jobs loaded!")
+                st.sidebar.success(f"{len(new_df)} jobs loaded!")
             else:
                 st.sidebar.warning("No data found or API error.")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("## 📂 Filters")
+st.sidebar.markdown("## Filters")
 
 df_display = st.session_state.df.copy()
 
@@ -278,18 +278,18 @@ else:
 # MAIN CONTENT
 # -----------------------------
 if df_display.empty:
-    st.info("👋 No data yet. Use the sidebar to fetch real-time jobs.")
+    st.info("No data yet. Use the sidebar to fetch real-time jobs.")
 else:
     # ── KPI CARDS ──
     col1, col2, col3 = st.columns(3)
-    col1.metric("📌 Total Jobs", len(df_display))
-    col2.metric("🏢 Unique Companies", df_display["Company"].nunique())
-    col3.metric("📍 Unique Locations", df_display["Location"].nunique())
+    col1.metric("Total Jobs", len(df_display))
+    col2.metric("Unique Companies", df_display["Company"].nunique())
+    col3.metric("Unique Locations", df_display["Location"].nunique())
 
     st.markdown("<hr>", unsafe_allow_html=True)
 
     # ── TABS ──
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🛠 Skills & Salary", "📄 Job Listings"])
+    tab1, tab2, tab3 = st.tabs(["Dashboard", "Skills & Salary", "Job Listings"])
 
     # ─────────── TAB 1: DASHBOARD ───────────
     with tab1:
@@ -297,11 +297,11 @@ else:
         colA, colB = st.columns(2)
 
         with colA:
-            st.markdown("**🏢 Top Companies Hiring**")
+            st.markdown("**Top Companies Hiring**")
             st.bar_chart(df_display["Company"].value_counts().head(10))
 
         with colB:
-            st.markdown("**📍 Top Locations**")
+            st.markdown("**Top Locations**")
             st.bar_chart(df_display["Location"].value_counts().head(10))
 
     # ─────────── TAB 2: SKILLS & SALARY ───────────
@@ -320,10 +320,10 @@ else:
 
             colC, colD = st.columns([2, 1])
             with colC:
-                st.markdown("**🔥 Most In-Demand Skills**")
+                st.markdown("**Most In-Demand Skills**")
                 st.bar_chart(skills_df.set_index("Skill").head(10))
             with colD:
-                st.markdown("**🥧 Skills Distribution**")
+                st.markdown("**Skills Distribution**")
                 fig, ax = plt.subplots(figsize=(4, 4))
                 fig.patch.set_facecolor('#0f0c29')
                 ax.set_facecolor('#0f0c29')
@@ -341,13 +341,13 @@ else:
             st.info("No skills data available.")
 
         st.markdown("<hr>", unsafe_allow_html=True)
-        st.markdown('<p class="section-header">💰 Salary Insights</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-header">Salary Insights</p>', unsafe_allow_html=True)
         salary_df = df_display[df_display["salary"] > 0]
 
         if not salary_df.empty:
             sc1, sc2 = st.columns(2)
-            sc1.metric("📈 Average Salary", f"₹{salary_df['salary'].mean():,.0f}")
-            sc2.metric("🏆 Max Salary", f"₹{salary_df['salary'].max():,.0f}")
+            sc1.metric("Average Salary", f"₹{salary_df['salary'].mean():,.0f}")
+            sc2.metric("Max Salary", f"₹{salary_df['salary'].max():,.0f}")
             st.markdown("**Salaries by Company**")
             st.bar_chart(salary_df[["Company", "salary"]].set_index("Company").head(15))
         else:
@@ -355,7 +355,7 @@ else:
 
     # ─────────── TAB 3: JOB CARDS ───────────
     with tab3:
-        st.markdown(f'<p class="section-header">📄 {len(df_display)} Job Listings</p>', unsafe_allow_html=True)
+        st.markdown(f'<p class="section-header">{len(df_display)} Job Listings</p>', unsafe_allow_html=True)
 
         cards_html = ""
         for _, row in df_display.iterrows():
@@ -374,14 +374,14 @@ else:
             cards_html += f"""
             <div class="job-card">
                 <h3 class="job-title">{row['Title']}</h3>
-                <p class="job-detail">🏢 <strong>Company:</strong>&nbsp; {row['Company']}</p>
-                <p class="job-detail">📍 <strong>Location:</strong>&nbsp; {row['Location']}</p>
+                <p class="job-detail"><strong>Company:</strong>&nbsp; {row['Company']}</p>
+                <p class="job-detail"><strong>Location:</strong>&nbsp; {row['Location']}</p>
                 <div class="job-detail" style="flex-wrap:wrap; align-items:flex-start;">
-                    <span>🛠 <strong>Skills:</strong>&nbsp;</span>
+                    <span><strong>Skills:</strong>&nbsp;</span>
                     {skill_tags}
                 </div>
                 <div style="margin-top: 10px;">
-                    <span class="{salary_color}">💰 {salary_text}</span>
+                    <span class="{salary_color}">{salary_text}</span>
                 </div>
             </div>
             """
@@ -390,4 +390,4 @@ else:
 
         st.markdown("<br>", unsafe_allow_html=True)
         csv = df_display.to_csv(index=False)
-        st.download_button("📥 Download as CSV", csv, "jobs.csv", "text/csv", use_container_width=True)
+        st.download_button("Download as CSV", csv, "jobs.csv", "text/csv", use_container_width=True)
