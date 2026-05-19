@@ -194,17 +194,7 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# HERO BANNER
-# -----------------------------
-st.markdown("""
-<div class="hero-banner">
-    <div class="hero-badge">Live Data Analytics</div>
-    <h1 class="hero-title">HireScope</h1>
-    <p class="hero-subtitle">Real-Time Job Market Intelligence Platform &nbsp;·&nbsp; Powered by Adzuna API</p>
-</div>
-""", unsafe_allow_html=True)
-
+# (Old Hero Banner removed to avoid duplication with HTML template)
 # -----------------------------
 # SESSION STATE INITIALIZATION
 # -----------------------------
