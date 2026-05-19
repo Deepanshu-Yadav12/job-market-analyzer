@@ -33,163 +33,160 @@ st.set_page_config(
 # -----------------------------
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
+    background-color: #0D0D0D !important;
+    color: #F0EDE8 !important;
+}
+
+/* Override Streamlit Main Container */
+.stApp {
+    background-color: #0D0D0D;
 }
 
 /* ── HERO BANNER ── */
 .hero-banner {
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    border-radius: 16px;
-    padding: 36px 40px;
-    margin-bottom: 28px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    background: #141414;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 40px;
+    margin-bottom: 30px;
     position: relative;
     overflow: hidden;
 }
-.hero-banner::before {
-    content: "";
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 220px; height: 220px;
-    background: radial-gradient(circle, rgba(79,139,249,0.25), transparent 70%);
-    border-radius: 50%;
-}
 .hero-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0 0 8px 0;
-    letter-spacing: -0.5px;
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #F0EDE8;
+    margin: 0 0 10px 0;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+.hero-title em {
+    color: #E8C547;
+    font-style: italic;
 }
 .hero-subtitle {
-    font-size: 1rem;
-    color: #a0aec0;
+    font-size: 1.05rem;
+    color: #8A8680;
     margin: 0;
+    font-weight: 300;
 }
 .hero-badge {
-    display: inline-block;
-    background: rgba(79,139,249,0.2);
-    border: 1px solid rgba(79,139,249,0.4);
-    color: #7eb3ff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(61,173,127,0.3);
+    color: #3DAD7F;
     font-size: 0.75rem;
     font-weight: 600;
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
-    margin-bottom: 14px;
-    letter-spacing: 1px;
+    margin-bottom: 20px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 /* ── KPI METRIC CARDS ── */
 div[data-testid="metric-container"] {
-    background: linear-gradient(145deg, #1a1a2e, #16213e);
-    border: 1px solid rgba(79,139,249,0.3);
+    background: #141414;
+    border: 1px solid rgba(255,255,255,0.07);
     padding: 20px 24px;
-    border-radius: 14px;
-    color: #ffffff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 12px;
+    transition: background 0.2s;
 }
 div[data-testid="metric-container"]:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(79,139,249,0.2);
+    background: #1C1C1C;
 }
 div[data-testid="metric-container"] label {
-    color: #a0aec0 !important;
-    font-size: 0.82rem !important;
+    color: #5A5754 !important;
+    font-size: 0.75rem !important;
     font-weight: 600 !important;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 div[data-testid="metric-container"] div[data-testid="stMetricValue"] {
-    color: #ffffff !important;
-    font-size: 1.8rem !important;
+    font-family: 'Playfair Display', serif;
+    color: #F0EDE8 !important;
+    font-size: 2.2rem !important;
     font-weight: 700 !important;
 }
 
 /* ── JOB CARDS ── */
 .job-card {
-    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    background: #141414;
     padding: 20px 24px;
-    border-radius: 14px;
+    border-radius: 12px;
     margin-bottom: 14px;
-    border: 1px solid rgba(79,139,249,0.2);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-    position: relative;
-    overflow: hidden;
-}
-.job-card::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: linear-gradient(180deg, #4F8BF9, #7c3aed);
-    border-radius: 4px 0 0 4px;
+    border: 1px solid rgba(255,255,255,0.07);
+    transition: background 0.2s;
 }
 .job-card:hover {
-    border-color: rgba(79,139,249,0.6);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(79,139,249,0.2);
+    background: #1C1C1C;
 }
 .job-title {
-    margin: 0 0 10px 0;
-    color: #e2e8f0;
-    font-size: 1.1rem;
-    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #F0EDE8;
+    font-size: 1.15rem;
+    font-weight: 500;
 }
 .job-detail {
-    margin: 5px 0;
-    color: #94a3b8;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    margin: 4px 0;
+    color: #8A8680;
+    font-size: 0.85rem;
 }
 .job-detail strong {
-    color: #cbd5e1;
+    color: #5A5754;
+    font-weight: 500;
 }
 .skill-tag {
     display: inline-block;
-    background: rgba(79,139,249,0.15);
-    border: 1px solid rgba(79,139,249,0.3);
-    color: #7eb3ff;
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 2px 10px;
-    border-radius: 20px;
-    margin: 3px 3px 0 0;
+    background: rgba(232,197,71,0.1);
+    border: 1px solid rgba(232,197,71,0.2);
+    color: #E8C547;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin: 4px 4px 0 0;
 }
 .salary-badge {
     display: inline-block;
-    background: rgba(16,185,129,0.15);
-    border: 1px solid rgba(16,185,129,0.3);
-    color: #34d399;
+    background: rgba(61,173,127,0.1);
+    border: 1px solid rgba(61,173,127,0.2);
+    color: #3DAD7F;
     font-size: 0.8rem;
     font-weight: 600;
-    padding: 3px 12px;
-    border-radius: 20px;
-    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
 }
 
 /* ── SECTION HEADERS ── */
 .section-header {
-    font-size: 1.1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
     font-weight: 700;
-    color: #e2e8f0;
-    margin: 0 0 16px 0;
-    padding-bottom: 8px;
-    border-bottom: 2px solid rgba(79,139,249,0.3);
+    color: #F0EDE8;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 
-/* ── DIVIDER ── */
 hr {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    margin: 24px 0;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    margin: 30px 0;
+}
+
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background-color: #141414 !important;
+    border-right: 1px solid rgba(255,255,255,0.07);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -200,6 +197,9 @@ hr {
 st.markdown("""
 <div class="hero-banner">
     <div class="hero-badge">Live Data Analytics</div>
+    <h1 class="hero-title">The <em>smartest</em> way to read the market.</h1>
+    <p class="hero-subtitle">Real-Time Job Market Intelligence Platform &nbsp;·&nbsp; Powered by Adzuna API</p>
+</div>
     <h1 class="hero-title">HireScope</h1>
     <p class="hero-subtitle">Real-Time Job Market Intelligence Platform &nbsp;·&nbsp; Powered by Adzuna API</p>
 </div>
