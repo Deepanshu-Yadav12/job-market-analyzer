@@ -194,7 +194,17 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-# (Old Hero Banner removed to avoid duplication with HTML template)
+# -----------------------------
+# HERO BANNER
+# -----------------------------
+st.markdown("""
+<div class="hero-banner">
+    <div class="hero-badge">Live Data Analytics</div>
+    <h1 class="hero-title">HireScope</h1>
+    <p class="hero-subtitle">Real-Time Job Market Intelligence Platform &nbsp;·&nbsp; Powered by Adzuna API</p>
+</div>
+""", unsafe_allow_html=True)
+
 # -----------------------------
 # SESSION STATE INITIALIZATION
 # -----------------------------
@@ -267,90 +277,117 @@ else:
 # -----------------------------
 # MAIN CONTENT
 # -----------------------------
-
-import streamlit.components.v1 as components
-from collections import Counter
-
 if df_display.empty:
     st.info("No data yet. Use the sidebar to fetch real-time jobs.")
 else:
-    # Read the HTML template
-    with open("template.html", "r", encoding="utf-8") as f:
-        html_template = f.read()
-    
-    # Calculate stats
-    total_jobs = f"{len(df_display):,}"
-    unique_companies = f"{df_display['Company'].nunique():,}"
-    salary_df = df_display[df_display["salary"] > 0]
-    avg_salary = f"₹{salary_df['salary'].mean() / 100000:.1f}L" if not salary_df.empty else "N/A"
-    
-    # Generate Companies HTML
-    companies_html = ""
-    top_companies = df_display["Company"].value_counts().head(7)
-    max_comp_count = top_companies.max() if not top_companies.empty else 1
-    for comp, count in top_companies.items():
-        width = int((count / max_comp_count) * 100)
-        companies_html += f'<div class="bar-row"><span class="bar-label">{comp}</span><div class="bar-track"><div class="bar-fill" style="width:{width}%"></div></div><span class="bar-count">{count}</span></div>\n'
-        
-    # Generate Locations HTML
-    locations_html = ""
-    top_locations = df_display["Location"].value_counts().head(7)
-    max_loc_count = top_locations.max() if not top_locations.empty else 1
-    for loc, count in top_locations.items():
-        width = int((count / max_loc_count) * 100)
-        locations_html += f'<div class="bar-row"><span class="bar-label">{loc}</span><div class="bar-track"><div class="bar-fill green" style="width:{width}%"></div></div><span class="bar-count">{count}</span></div>\n'
-        
-    # Generate Jobs HTML
-    jobs_html = ""
-    for _, row in df_display.head(5).iterrows():
-        salary_text = f"₹{row['salary']/100000:.1f}L" if row["salary"] > 0 else "Not Disclosed"
-        jobs_html += f'''
-        <div class="job-row">
-            <div class="job-row-left">
-                <div class="job-title">{row['Title']}</div>
-                <div class="job-company">{row['Company']} · {row['Location']}</div>
-            </div>
-            <div class="job-row-right">
-                <span class="job-salary">{salary_text}</span>
-            </div>
-        </div>'''
-        
-    # Generate Skills HTML
-    skills_html = ""
-    valid_skills = [s for s in df_display["skills"] if pd.notna(s) and s != "Not Specified"]
-    if valid_skills:
-        all_skills = ",".join(valid_skills)
-        skills_list = [s.strip() for s in all_skills.split(",") if s.strip()]
-        skill_counts = Counter(skills_list).most_common(12)
-        for i, (skill, count) in enumerate(skill_counts):
-            if i < 3: style = "skill-hot"
-            elif i < 8: style = "skill-warm"
-            else: style = "skill-cool"
-            skills_html += f'<span class="skill-pill {style}">{skill}</span>\n'
+    # ── KPI CARDS ──
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Jobs", len(df_display))
+    col2.metric("Unique Companies", df_display["Company"].nunique())
+    col3.metric("Unique Locations", df_display["Location"].nunique())
 
-    # Inject into template
-    html_filled = html_template.replace("{TOTAL_JOBS}", total_jobs)
-    html_filled = html_filled.replace("{UNIQUE_COMPANIES}", unique_companies)
-    html_filled = html_filled.replace("{AVG_SALARY}", avg_salary)
-    html_filled = html_filled.replace("{COMPANIES_HTML}", companies_html)
-    html_filled = html_filled.replace("{LOCATIONS_HTML}", locations_html)
-    html_filled = html_filled.replace("{JOBS_HTML}", jobs_html)
-    html_filled = html_filled.replace("{SKILLS_HTML}", skills_html)
-    
-    # Hide default Streamlit padding
-    st.markdown('''
-        <style>
-            .block-container {
-                padding-top: 0rem;
-                padding-bottom: 0rem;
-                padding-left: 0rem;
-                padding-right: 0rem;
-                max-width: 100%;
-            }
-            header {visibility: hidden;}
-            footer {visibility: hidden;}
-        </style>
-    ''', unsafe_allow_html=True)
-    
-    # Render custom HTML
-    components.html(html_filled, height=1800, scrolling=True)
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+    # ── TABS ──
+    tab1, tab2, tab3 = st.tabs(["Dashboard", "Skills & Salary", "Job Listings"])
+
+    # ─────────── TAB 1: DASHBOARD ───────────
+    with tab1:
+        st.markdown('<p class="section-header">Market Overview</p>', unsafe_allow_html=True)
+        colA, colB = st.columns(2)
+
+        with colA:
+            st.markdown("**Top Companies Hiring**")
+            st.bar_chart(df_display["Company"].value_counts().head(10))
+
+        with colB:
+            st.markdown("**Top Locations**")
+            st.bar_chart(df_display["Location"].value_counts().head(10))
+
+    # ─────────── TAB 2: SKILLS & SALARY ───────────
+    with tab2:
+        st.markdown('<p class="section-header">Skills Analysis</p>', unsafe_allow_html=True)
+        valid_skills = [s for s in df_display["skills"] if pd.notna(s) and s != "Not Specified"]
+
+        if valid_skills:
+            all_skills = ",".join(valid_skills)
+            skills_list = [s.strip() for s in all_skills.split(",") if s.strip()]
+            skill_counts = Counter(skills_list)
+            skills_df = pd.DataFrame({
+                "Skill": list(skill_counts.keys()),
+                "Count": list(skill_counts.values())
+            }).sort_values(by="Count", ascending=False)
+
+            colC, colD = st.columns([2, 1])
+            with colC:
+                st.markdown("**Most In-Demand Skills**")
+                st.bar_chart(skills_df.set_index("Skill").head(10))
+            with colD:
+                st.markdown("**Skills Distribution**")
+                fig, ax = plt.subplots(figsize=(4, 4))
+                fig.patch.set_facecolor('#0f0c29')
+                ax.set_facecolor('#0f0c29')
+                wedges, texts, autotexts = ax.pie(
+                    skills_df["Count"].head(7),
+                    labels=skills_df["Skill"].head(7),
+                    autopct="%1.0f%%",
+                    startangle=140,
+                    textprops={'color': '#e2e8f0', 'fontsize': 8}
+                )
+                for a in autotexts:
+                    a.set_color('#ffffff')
+                st.pyplot(fig)
+        else:
+            st.info("No skills data available.")
+
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown('<p class="section-header">Salary Insights</p>', unsafe_allow_html=True)
+        salary_df = df_display[df_display["salary"] > 0]
+
+        if not salary_df.empty:
+            sc1, sc2 = st.columns(2)
+            sc1.metric("Average Salary", f"₹{salary_df['salary'].mean():,.0f}")
+            sc2.metric("Max Salary", f"₹{salary_df['salary'].max():,.0f}")
+            st.markdown("**Salaries by Company**")
+            st.bar_chart(salary_df[["Company", "salary"]].set_index("Company").head(15))
+        else:
+            st.info("No salary data available.")
+
+    # ─────────── TAB 3: JOB CARDS ───────────
+    with tab3:
+        st.markdown(f'<p class="section-header">{len(df_display)} Job Listings</p>', unsafe_allow_html=True)
+
+        cards_html = ""
+        for _, row in df_display.iterrows():
+            salary_text = f"₹{row['salary']:,.0f}" if row["salary"] > 0 else "Not Disclosed"
+            salary_color = "salary-badge" if row["salary"] > 0 else "salary-badge"
+
+            # Build skill tags
+            skills_raw = str(row["skills"]) if pd.notna(row["skills"]) else "Not Specified"
+            if skills_raw != "Not Specified":
+                skill_tags = "".join(
+                    [f'<span class="skill-tag">{s.strip()}</span>' for s in skills_raw.split(",") if s.strip()]
+                )
+            else:
+                skill_tags = '<span class="skill-tag">Not Specified</span>'
+
+            cards_html += f"""
+            <div class="job-card">
+                <h3 class="job-title">{row['Title']}</h3>
+                <p class="job-detail"><strong>Company:</strong>&nbsp; {row['Company']}</p>
+                <p class="job-detail"><strong>Location:</strong>&nbsp; {row['Location']}</p>
+                <div class="job-detail" style="flex-wrap:wrap; align-items:flex-start;">
+                    <span><strong>Skills:</strong>&nbsp;</span>
+                    {skill_tags}
+                </div>
+                <div style="margin-top: 10px;">
+                    <span class="{salary_color}">{salary_text}</span>
+                </div>
+            </div>
+            """
+
+        st.markdown(cards_html, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        csv = df_display.to_csv(index=False)
+        st.download_button("Download as CSV", csv, "jobs.csv", "text/csv", use_container_width=True)
