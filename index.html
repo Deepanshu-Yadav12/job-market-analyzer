@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HireScope — Job Market Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0D0D;
+    --surface: #141414;
+    --surface2: #1C1C1C;
+    --surface3: #242424;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: #F0EDE8;
+    --text-muted: #8A8680;
+    --text-dim: #5A5754;
+    --accent: #E8C547;
+    --accent2: #C84B2F;
+    --accent3: #3DAD7F;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 16px; }
+  body { min-height: 100vh; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.5rem;
+    height: 64px;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 1.35rem; font-weight: 700;
+    letter-spacing: -0.02em; color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; font-weight: 400; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--text); }
+  .nav-links a.active { position: relative; }
+  .nav-links a.active::after { content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 1px; background: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .badge-live {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent3); padding: 4px 10px;
+    border: 1px solid rgba(61,173,127,0.3); border-radius: 20px;
+  }
+  .badge-live::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent3);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 5rem 2.5rem 3.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 1.25rem;
+  }
+  .hero-title {
+    font-family: var(--font-display); font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 900; line-height: 1.0; letter-spacing: -0.03em;
+    color: var(--text); max-width: 700px; margin-bottom: 1.5rem;
+  }
+  .hero-title em { font-style: italic; color: var(--accent); }
+  .hero-sub {
+    font-size: 1rem; color: var(--text-muted); max-width: 440px; line-height: 1.65;
+    font-weight: 300;
+  }
+  .hero-meta { margin-top: 2rem; display: flex; align-items: center; gap: 2rem; }
+  .hero-meta-item { font-size: 0.78rem; color: var(--text-dim); }
+  .hero-meta-item span { color: var(--text-muted); margin-left: 4px; }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    display: flex; align-items: center; gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 2.5rem;
+    background: var(--surface);
+  }
+  .tab {
+    padding: 0.85rem 1.4rem;
+    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.02em;
+    color: var(--text-dim);
+    border-bottom: 2px solid transparent;
+    cursor: pointer; transition: all 0.2s;
+    user-select: none; white-space: nowrap;
+  }
+  .tab:hover { color: var(--text-muted); }
+  .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* ── MAIN LAYOUT ── */
+  main { padding: 2rem 2.5rem; max-width: 1400px; margin: 0 auto; }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    margin-bottom: 2rem;
+    background: var(--border);
+  }
+  .stat-card {
+    background: var(--surface);
+    padding: 1.6rem 1.75rem;
+    transition: background 0.2s;
+  }
+  .stat-card:hover { background: var(--surface2); }
+  .stat-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.6rem; }
+  .stat-value { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-delta { margin-top: 0.5rem; font-size: 0.75rem; color: var(--accent3); }
+  .stat-delta.down { color: var(--accent2); }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .section-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .section-link { font-size: 0.75rem; color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+  .section-link:hover { color: var(--accent); }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem 1.5rem;
+  }
+
+  /* ── BAR CHART ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; margin-top: 1rem; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 0.72rem; color: var(--text-muted); width: 120px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 1s cubic-bezier(0.16,1,0.3,1); }
+  .bar-fill.red { background: var(--accent2); }
+  .bar-fill.green { background: var(--accent3); }
+  .bar-count { font-size: 0.72rem; color: var(--text-dim); width: 24px; text-align: right; flex-shrink: 0; }
+
+  /* ── JOB LIST ── */
+  .job-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .job-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); padding: 1rem 1.25rem;
+    transition: background 0.15s; cursor: pointer;
+  }
+  .job-row:hover { background: var(--surface2); }
+  .job-row-left { display: flex; flex-direction: column; gap: 3px; }
+  .job-title { font-size: 0.875rem; font-weight: 500; color: var(--text); }
+  .job-company { font-size: 0.75rem; color: var(--text-dim); }
+  .job-row-right { display: flex; align-items: center; gap: 1rem; }
+  .job-tag {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .tag-remote { background: rgba(61,173,127,0.12); color: var(--accent3); }
+  .tag-hybrid { background: rgba(232,197,71,0.12); color: var(--accent); }
+  .tag-onsite { background: rgba(200,75,47,0.12); color: var(--accent2); }
+  .job-salary { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+
+  /* ── SKILLS HEAT ── */
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
+  .skill-pill {
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+  .skill-hot   { background: rgba(232,197,71,0.15); border-color: rgba(232,197,71,0.3); color: var(--accent); }
+  .skill-warm  { background: rgba(61,173,127,0.12); border-color: rgba(61,173,127,0.25); color: var(--accent3); }
+  .skill-cool  { background: var(--surface3); border-color: var(--border); color: var(--text-muted); }
+
+  /* ── SALARY BAND ── */
+  .salary-range { margin-top: 1rem; }
+  .salary-band-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .salary-role { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; }
+  .salary-track { position: relative; height: 24px; background: var(--surface3); border-radius: 6px; overflow: hidden; }
+  .salary-bar { position: absolute; top: 0; bottom: 0; border-radius: 6px; background: linear-gradient(90deg, var(--surface3), var(--accent)); opacity: 0.85; }
+  .salary-labels { display: flex; justify-content: space-between; font-size: 0.67rem; color: var(--text-dim); margin-top: 2px; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 4rem; padding: 2rem 2.5rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-brand { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--text-dim); }
+  .footer-note { font-size: 0.72rem; color: var(--text-dim); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+  .delay-1 { animation-delay: 0.05s; }
+  .delay-2 { animation-delay: 0.1s; }
+  .delay-3 { animation-delay: 0.15s; }
+  .delay-4 { animation-delay: 0.2s; }
+
+  /* ── SEARCH ── */
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 1rem;
+    margin-bottom: 2rem; max-width: 520px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within { border-color: var(--border-hover); }
+  .search-bar input {
+    flex: 1; background: none; border: none; outline: none;
+    color: var(--text); font-family: var(--font-body); font-size: 0.875rem;
+    font-weight: 300;
+  }
+  .search-bar input::placeholder { color: var(--text-dim); }
+  .search-icon { color: var(--text-dim); font-size: 1rem; }
+
+  /* ── MINI SPARKLINE ── */
+  .sparkline-row { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-top: 0.5rem; }
+  .spark-bar { flex: 1; border-radius: 2px 2px 0 0; background: rgba(232,197,71,0.25); min-width: 0; transition: background 0.2s; }
+  .spark-bar:hover { background: var(--accent); }
+  .spark-bar.peak { background: var(--accent); }
+
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    nav { padding: 0 1.25rem; }
+    .hero, main { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .tabs-bar { padding: 0 1.25rem; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-dot"></div>
+    HireScope
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Dashboard</a></li>
+    <li><a href="#">Skills &amp; Salary</a></li>
+    <li><a href="#">Job Listings</a></li>
+    <li><a href="#">Companies</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="badge-live">Live Data</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero fade-up">
+  <p class="hero-eyebrow">Real-Time Job Market Intelligence · Powered by Adzuna API</p>
+  <h1 class="hero-title">The <em>smartest</em> way to read the market.</h1>
+  <p class="hero-sub">Track hiring trends, salary ranges, and in-demand skills — refreshed in real time across every major industry.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">Updated <span>Just now</span></div>
+    <div class="hero-meta-item">10,000+ <span>active listings</span></div>
+    <div class="hero-meta-item">India <span>focus</span></div>
+  </div>
+</section>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab active" onclick="switchTab(this)">Market Overview</div>
+  <div class="tab" onclick="switchTab(this)">Skills &amp; Salary</div>
+  <div class="tab" onclick="switchTab(this)">Job Listings</div>
+  <div class="tab" onclick="switchTab(this)">Trends</div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- STATS -->
+  <div class="stats-row fade-up delay-1">
+    <div class="stat-card">
+      <div class="stat-label">Total Jobs</div>
+      <div class="stat-value">12,482</div>
+      <div class="stat-delta">↑ 5.2% this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unique Companies</div>
+      <div class="stat-value">1,240</div>
+      <div class="stat-delta">↑ 2.1% this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg. Salary</div>
+      <div class="stat-value">₹12.5L</div>
+      <div class="stat-delta">↑ ₹50k vs last month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Remote Roles</div>
+      <div class="stat-value">22%</div>
+      <div class="stat-delta down">↓ 0.5% this week</div>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-bar fade-up delay-2">
+    <span class="search-icon">⌕</span>
+    <input type="text" placeholder="Search Data Analyst roles, companies, or skills in India…">
+  </div>
+
+  <!-- ROW 1: Companies + Locations -->
+  <div class="grid-2 fade-up delay-2">
+    <div class="chart-card">
+      <div class="section-header">
+        <div class="section-title">Top Companies Hiring</div>
+        <a href="#" class="section-link">View all →</a>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-label">TCS</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-count">142</span></div>
+        <div class="bar-row"><span class="bar-label">Infosys</span><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div><span class="bar-count">120</span></div>
+        <div class="bar-row"><span class="bar-label">Wipro</span><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><span class="bar-count">105</span></div>
+        <div class="bar-row"><span class="bar-label">Amazon India</span><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div><span class="bar-count">88</span></div>
+        <div class="bar-row"><span class="bar-label">Accenture</span><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><span class="bar-count">71</span></div>
+        <div class="bar-row"><span class="bar-label">Google India</span><div class="bar-track"><div class="bar-fill" style="width:35%"></div></div><span class="bar-count">49</span></div>
+        <div class="bar-row"><span class="bar-label">Microsoft India</span><div class="bar-track"><div class="bar-fill" style="width:25%"></div></div><span class="bar-count">35</span></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="section-header">
+        <div class="section-title">Top Locations</div>
+        <a href="#" class="section-link">Map view →</a>
+      </div>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-label">Bangalore</span><div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div><span class="bar-count">3.2k</span></div>
+        <div class="bar-row"><span class="bar-label">Hyderabad</span><div class="bar-track"><div class="bar-fill green" style="width:80%"></div></div><span class="bar-count">2.5k</span></div>
+        <div class="bar-row"><span class="bar-label">Pune</span><div class="bar-track"><div class="bar-fill green" style="width:65%"></div></div><span class="bar-count">2.1k</span></div>
+        <div class="bar-row"><span class="bar-label">Mumbai</span><div class="bar-track"><div class="bar-fill green" style="width:55%"></div></div><span class="bar-count">1.8k</span></div>
+        <div class="bar-row"><span class="bar-label">Delhi NCR</span><div class="bar-track"><div class="bar-fill green" style="width:45%"></div></div><span class="bar-count">1.4k</span></div>
+        <div class="bar-row"><span class="bar-label">Chennai</span><div class="bar-track"><div class="bar-fill green" style="width:35%"></div></div><span class="bar-count">1.1k</span></div>
+        <div class="bar-row"><span class="bar-label">Remote</span><div class="bar-track"><div class="bar-fill green" style="width:20%"></div></div><span class="bar-count">600</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Latest Jobs -->
+  <div class="fade-up delay-3" style="margin-bottom: 2rem;">
+    <div class="section-header">
+      <div class="section-title">Latest Listings</div>
+      <a href="#" class="section-link">Browse all 12k+ →</a>
+    </div>
+    <div class="job-list">
+      <div class="job-row">
+        <div class="job-row-left">
+          <div class="job-title">Senior Data Analyst</div>
+          <div class="job-company">Amazon · Bangalore, Karnataka</div>
+        </div>
+        <div class="job-row-right">
+          <span class="job-tag tag-hybrid">Hybrid</span>
+          <span class="job-salary">₹18L–24L</span>
+        </div>
+      </div>
+      <div class="job-row">
+        <div class="job-row-left">
+          <div class="job-title">Machine Learning Engineer</div>
+          <div class="job-company">Google India · Hyderabad, Telangana</div>
+        </div>
+        <div class="job-row-right">
+          <span class="job-tag tag-hybrid">Hybrid</span>
+          <span class="job-salary">₹25L–35L</span>
+        </div>
+      </div>
+      <div class="job-row">
+        <div class="job-row-left">
+          <div class="job-title">Data Scientist</div>
+          <div class="job-company">Microsoft India · Remote</div>
+        </div>
+        <div class="job-row-right">
+          <span class="job-tag tag-remote">Remote</span>
+          <span class="job-salary">₹20L–30L</span>
+        </div>
+      </div>
+      <div class="job-row">
+        <div class="job-row-left">
+          <div class="job-title">Business Intelligence Analyst</div>
+          <div class="job-company">Flipkart · Bangalore, Karnataka</div>
+        </div>
+        <div class="job-row-right">
+          <span class="job-tag tag-onsite">On-site</span>
+          <span class="job-salary">₹12L–18L</span>
+        </div>
+      </div>
+      <div class="job-row">
+        <div class="job-row-left">
+          <div class="job-title">Data Engineer</div>
+          <div class="job-company">TCS · Pune, Maharashtra</div>
+        </div>
+        <div class="job-row-right">
+          <span class="job-tag tag-onsite">On-site</span>
+          <span class="job-salary">₹8L–15L</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Skills + Salary -->
+  <div class="grid-2 fade-up delay-4">
+    <div class="chart-card">
+      <div class="section-header">
+        <div class="section-title">Trending Skills</div>
+        <a href="#" class="section-link">Full breakdown →</a>
+      </div>
+      <div class="skills-grid">
+        <span class="skill-pill skill-hot">Python</span>
+        <span class="skill-pill skill-hot">SQL</span>
+        <span class="skill-pill skill-hot">Machine Learning</span>
+        <span class="skill-pill skill-warm">Power BI</span>
+        <span class="skill-pill skill-warm">Tableau</span>
+        <span class="skill-pill skill-warm">Excel</span>
+        <span class="skill-pill skill-warm">AWS</span>
+        <span class="skill-pill skill-warm">Azure</span>
+        <span class="skill-pill skill-cool">Java</span>
+        <span class="skill-pill skill-cool">C++</span>
+        <span class="skill-pill skill-cool">React</span>
+        <span class="skill-pill skill-cool">Node.js</span>
+      </div>
+      <div style="margin-top: 1.25rem; display: flex; gap: 1rem; font-size: 0.68rem; color: var(--text-dim);">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--accent);display:inline-block;"></span> High demand</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--accent3);display:inline-block;"></span> Rising</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:var(--surface3);border:1px solid var(--border);display:inline-block;"></span> Stable</span>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="section-header">
+        <div class="section-title">Salary Ranges by Role</div>
+        <a href="#" class="section-link">All roles →</a>
+      </div>
+      <div class="salary-range">
+        <div class="salary-band-row">
+          <div class="salary-role">Machine Learning Engineer</div>
+          <div class="salary-track"><div class="salary-bar" style="left:25%;right:15%"></div></div>
+          <div class="salary-labels"><span>₹15L</span><span>₹35L</span></div>
+        </div>
+        <div class="salary-band-row">
+          <div class="salary-role">Data Scientist</div>
+          <div class="salary-track"><div class="salary-bar" style="left:20%;right:20%"></div></div>
+          <div class="salary-labels"><span>₹12L</span><span>₹28L</span></div>
+        </div>
+        <div class="salary-band-row">
+          <div class="salary-role">Data Engineer</div>
+          <div class="salary-track"><div class="salary-bar" style="left:15%;right:30%"></div></div>
+          <div class="salary-labels"><span>₹8L</span><span>₹20L</span></div>
+        </div>
+        <div class="salary-band-row">
+          <div class="salary-role">Data Analyst</div>
+          <div class="salary-track"><div class="salary-bar" style="left:10%;right:40%"></div></div>
+          <div class="salary-labels"><span>₹6L</span><span>₹15L</span></div>
+        </div>
+        <div class="salary-band-row">
+          <div class="salary-role">Business Analyst</div>
+          <div class="salary-track"><div class="salary-bar" style="left:8%;right:45%"></div></div>
+          <div class="salary-labels"><span>₹5L</span><span>₹14L</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Weekly postings sparkline -->
+  <div class="chart-card fade-up delay-4" style="margin-bottom: 2rem;">
+    <div class="section-header">
+      <div class="section-title">Postings Volume — Last 12 Weeks</div>
+      <a href="#" class="section-link">Export CSV →</a>
+    </div>
+    <div style="display: flex; gap: 4px; align-items: flex-end; height: 72px; margin-top: 1rem;">
+      <div style="flex:1;height:40%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:52%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:45%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:60%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:70%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:58%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:75%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:82%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:68%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:88%;border-radius:3px 3px 0 0;background:rgba(232,197,71,0.2);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(232,197,71,0.2)'"></div>
+      <div style="flex:1;height:94%;border-radius:3px 3px 0 0;background:var(--accent);transition:background .2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='var(--accent)'"></div>
+      <div style="flex:1;height:100%;border-radius:3px 3px 0 0;background:var(--accent);transition:background .2s;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.67rem;color:var(--text-dim);">
+      <span>Mar 3</span><span>Mar 17</span><span>Mar 31</span><span>Apr 14</span><span>Apr 28</span><span>May 12</span><span>Today</span>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">HireScope</div>
+  <div class="footer-note">Powered by Adzuna API · Data refreshed every 5 minutes · © 2026 Deepanshu Yadav</div>
+</footer>
+
+<script>
+  function switchTab(el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>
